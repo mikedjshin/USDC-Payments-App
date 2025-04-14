@@ -1,30 +1,35 @@
-import { useContract, useContractRead, useContractWrite } from "@thirdweb-dev/react";
+import { useContract, useReadContract, useSendTransaction } from "thirdweb/react";
 import { CONTRACTS } from "../config/contracts";
-import { useWeb3 } from "@thirdweb-dev/react";
-import { Base } from "@thirdweb-dev/chains";
+import { useActiveAccount } from "thirdweb/react";
+import { base } from "thirdweb/chains";
+import { getContract } from "thirdweb/contract";
+import { client } from "../providers/ThirdwebProvider";
 
 export function useUSDC() {
-  const { chainId } = useWeb3();
-  const { contract } = useContract(CONTRACTS[Base.chainId].usdc, "token");
+  const account = useActiveAccount();
+  const contract = getContract({
+    client,
+    address: CONTRACTS[base.id].usdc,
+    chain: base,
+  });
 
-  const { data: balance, isLoading: isLoadingBalance } = useContractRead(
+  const { data: balance, isLoading: isLoadingBalance } = useReadContract({
     contract,
-    "balanceOf",
-    [address]
-  );
+    method: "balanceOf",
+    params: [account?.address || "0x"],
+  });
 
-  const { mutateAsync: transfer, isLoading: isTransferring } = useContractWrite(
-    contract,
-    "transfer"
-  );
+  const { mutate: sendTransaction, isPending: isTransferring } = useSendTransaction();
 
   const sendUSDC = async (to: string, amount: string) => {
-    if (!contract) throw new Error("Contract not initialized");
+    if (!account?.address) throw new Error("No account connected");
     
     const amountInWei = BigInt(amount) * BigInt(10 ** 6); // USDC has 6 decimals
     
-    return transfer({
-      args: [to, amountInWei],
+    return sendTransaction({
+      contract,
+      method: "transfer",
+      params: [to, amountInWei],
     });
   };
 

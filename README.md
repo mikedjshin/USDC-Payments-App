@@ -1,6 +1,6 @@
 # Thirdweb USDC Base App
 
-A modern personal finance application that allows users to manage USDC on Base network using Thirdweb's infrastructure. This project demonstrates how to leverage Thirdweb's SDK, Engine, and Account Abstraction features to create a seamless user experience.
+A modern personal finance application that allows users to manage USDC on Base network using Thirdweb's v4 SDK. This project demonstrates how to leverage Thirdweb's latest features to create a seamless user experience.
 
 ## Features
 
@@ -13,7 +13,7 @@ A modern personal finance application that allows users to manage USDC on Base n
 ## Prerequisites
 
 - Node.js 18+ installed
-- Thirdweb API key
+- Thirdweb Client ID
 - Base network RPC URL
 
 ## Getting Started
@@ -32,8 +32,6 @@ npm install
 3. Create a `.env.local` file with your environment variables:
 ```env
 NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_client_id
-NEXT_PUBLIC_THIRDWEB_API_KEY=your_api_key
-NEXT_PUBLIC_BASE_RPC_URL=your_base_rpc_url
 ```
 
 4. Run the development server:
@@ -51,12 +49,12 @@ npm run dev
 
 ## Thirdweb Integration
 
-This project uses several Thirdweb features:
+This project uses Thirdweb v4 features:
 
 - **Account Abstraction**: For gasless transactions and better UX
-- **Engine API**: For backend operations and relaying transactions
 - **React SDK**: For frontend integration
-- **Auth**: For secure authentication
+- **Contract Interactions**: For USDC token operations
+- **Wallet Connection**: For secure authentication
 
 ## License
 

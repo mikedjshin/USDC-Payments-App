@@ -1,7 +1,11 @@
-import { ThirdwebProvider } from "@thirdweb-dev/react";
-import { Base } from "@thirdweb-dev/chains";
-import { AuthProvider } from "@thirdweb-dev/auth";
+import { ThirdwebProvider } from "thirdweb/react";
+import { base } from "thirdweb/chains";
+import { createThirdwebClient } from "thirdweb";
 import { ReactNode } from "react";
+
+const client = createThirdwebClient({
+  clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
+});
 
 interface Props {
   children: ReactNode;
@@ -10,16 +14,10 @@ interface Props {
 export function ThirdwebAppProvider({ children }: Props) {
   return (
     <ThirdwebProvider
-      activeChain={Base}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-      authConfig={{
-        domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
-        authUrl: "/api/auth",
-      }}
+      client={client}
+      activeChain={base}
     >
-      <AuthProvider>
-        {children}
-      </AuthProvider>
+      {children}
     </ThirdwebProvider>
   );
 } 

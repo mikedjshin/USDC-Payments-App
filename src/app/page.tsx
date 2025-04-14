@@ -1,36 +1,25 @@
 'use client';
 
-import { useWeb3 } from "@thirdweb-dev/react";
-import { Base } from "@thirdweb-dev/chains";
+import { useActiveAccount, useActiveChain } from "thirdweb/react";
+import { base } from "thirdweb/chains";
 import { useState } from "react";
-import { ConnectWallet } from "@thirdweb-dev/react";
-import { useEngine } from "@thirdweb-dev/react/engine";
+import { ConnectButton } from "thirdweb/react";
+import { useUSDC } from "../hooks/useUSDC";
 
 export default function Home() {
-  const { address, chainId } = useWeb3();
+  const account = useActiveAccount();
+  const chain = useActiveChain();
   const [amount, setAmount] = useState<string>("");
   const [recipient, setRecipient] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const engine = useEngine();
+  const { sendUSDC, isTransferring, balance, isLoadingBalance } = useUSDC();
 
   const handleSendUSDC = async () => {
-    if (!address || !amount || !recipient) return;
+    if (!account?.address || !amount || !recipient) return;
 
-    setIsLoading(true);
     try {
-      // Use Thirdweb Engine to send USDC
-      const result = await engine.sendTransaction({
-        to: recipient,
-        value: amount,
-        data: "0x", // USDC transfer data
-      });
-
-      console.log("Transaction sent:", result);
+      await sendUSDC(recipient, amount);
     } catch (error) {
       console.error("Error sending USDC:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -40,10 +29,17 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-8">USDC on Base</h1>
         
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-          <ConnectWallet />
+          <ConnectButton />
           
-          {address && chainId === Base.chainId && (
+          {account?.address && chain?.id === base.id && (
             <div className="mt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Balance</label>
+                <p className="text-lg font-semibold">
+                  {isLoadingBalance ? "Loading..." : `${balance?.toString() || "0"} USDC`}
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium mb-2">Amount (USDC)</label>
                 <input
@@ -68,15 +64,15 @@ export default function Home() {
               
               <button
                 onClick={handleSendUSDC}
-                disabled={isLoading || !amount || !recipient}
+                disabled={isTransferring || !amount || !recipient}
                 className="w-full bg-primary text-white py-2 px-4 rounded hover:bg-primary/90 disabled:opacity-50"
               >
-                {isLoading ? "Sending..." : "Send USDC"}
+                {isTransferring ? "Sending..." : "Send USDC"}
               </button>
             </div>
           )}
           
-          {address && chainId !== Base.chainId && (
+          {account?.address && chain?.id !== base.id && (
             <p className="mt-4 text-red-500">
               Please switch to Base network to use this application.
             </p>
